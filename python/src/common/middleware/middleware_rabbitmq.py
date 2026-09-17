@@ -31,7 +31,7 @@ class MessageMiddlewareQueueRabbitMQ(MessageMiddlewareQueue):
             #Envio el mensaje en el body a la cola del identificador routing_key
             self.channel.basic_publish(exchange="",routing_key=self.queue_name,body=message)
         except pika.exceptions.AMQPConnectionError as e:
-            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost {e}")
+            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost in SEND{e}")
         except  pika.exceptions.AMQPError as e:
             raise MessageMiddlewareMessageError(f"Internal Error {e}")
 
@@ -61,7 +61,7 @@ class MessageMiddlewareQueueRabbitMQ(MessageMiddlewareQueue):
             self.channel.basic_consume(queue=self.queue_name,on_message_callback=on_message)
             self.channel.start_consuming()
         except pika.exceptions.AMQPConnectionError as e:
-            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost {e}")
+            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost cant start consuming{e}")
         except pika.exceptions.AMQPError as e:
             raise MessageMiddlewareMessageError(f"Internal Error {e}")
 
@@ -73,7 +73,7 @@ class MessageMiddlewareQueueRabbitMQ(MessageMiddlewareQueue):
             # Interrumpimos el estado de estar escuchando eventos, sin cerrar ninguna conexion
             self.channel.stop_consuming()
         except pika.exceptions.AMQPConnectionError as e:
-            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost {e}")
+            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost cant stop consuming {e}")
 
     #Se desconecta de la cola o exchange al que estaba conectado.
 	#Si ocurre un error interno que no puede resolverse eleva MessageMiddlewareCloseError.
@@ -115,7 +115,7 @@ class MessageMiddlewareExchangeRabbitMQ(MessageMiddlewareExchange):
                 self.channel.basic_publish(exchange=self.exchange_name,routing_key=key,body=message)
 
         except pika.exceptions.AMQPConnectionError as e:
-            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost {e}")
+            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost in SEND {e}")
         except pika.exceptions.AMQPError as e:
             raise MessageMiddlewareMessageError(f"Internal Error {e}")
 
@@ -151,7 +151,7 @@ class MessageMiddlewareExchangeRabbitMQ(MessageMiddlewareExchange):
             self.channel.basic_consume(queue=self.queue_name,on_message_callback=on_message)
             self.channel.start_consuming()
         except pika.exceptions.AMQPConnectionError as e:
-            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost {e}")
+            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost cant start consuming {e}")
         except pika.exceptions.AMQPError as e:
             raise MessageMiddlewareMessageError(f"Internal Error {e}")
 
@@ -163,7 +163,7 @@ class MessageMiddlewareExchangeRabbitMQ(MessageMiddlewareExchange):
             # Interrumpimos el estado de estar escuchando eventos, sin cerrar ninguna conexion
             self.channel.stop_consuming()
         except pika.exceptions.AMQPConnectionError as e:
-            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost {e}")
+            raise MessageMiddlewareDisconnectedError(f"Connection to middleware lost cant stop consuming {e}")
 
     #Se desconecta de la cola o exchange al que estaba conectado.
 	#Si ocurre un error interno que no puede resolverse eleva MessageMiddlewareCloseError.
